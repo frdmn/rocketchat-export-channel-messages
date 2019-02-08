@@ -38,7 +38,8 @@ function testIfChannelOrGroup(roomName, callback){
             return callback({type:'channel'});
         } else {
             rocketChatClient.groups.info({roomName}, function (err, body) {
-                if (!err && body.success) {
+                if (err) error(err);
+                if (body.success) {
                     return callback({type:'group'});
                 } else {
                     return callback(false);
