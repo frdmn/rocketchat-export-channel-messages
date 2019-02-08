@@ -48,29 +48,6 @@ function testIfChannelOrGroup(roomName, callback){
     });
 }
 
-var packagejson = require('./package.json');
-
-program
-    .version(packagejson.version)
-    .description(packagejson.description)
-    .option('-r, --room [roomName]', 'roomName of channel or group to export messages from')
-    .option('-j, --json', 'Export as JSON file rather than CSV')
-    .parse(process.argv);
-
-// Load configuration object for RocketChat API from JSON
-var config = require('./config.json');
-
-// Check for mandantory "-r" flag
-if (!program.room) {
-    program.outputHelp(() => program.help());
-}
-
-// Create client
-var rocketChatClient = new RocketChatClient(config);
-
-// Empty array that will hold the message objects
-var messageArray = [];
-
 /**
  * Function to repeatedly send rocketChatClient.channels.messages()
  * to iterate over result pagination until final page is received
@@ -79,7 +56,7 @@ var messageArray = [];
  * @param {Integer} offset - Optional offset can be passed
  * @param {Object} callback - {data, totalCollected, roomType, roomName}
  */
- function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
+function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
     var count = 100;
     rocketChatClient[roomType].messages({roomName: roomName, offset: offset, count: count}, function (err, body) {
         if (err) error(err);
@@ -97,6 +74,29 @@ var messageArray = [];
         }
     });
 }
+
+var packagejson = require('./package.json');
+
+program
+    .version(packagejson.version)
+    .description(packagejson.description)
+    .option('-r, --room [roomName]', 'roomName of channel or group to export messages from')
+    .option('-j, --json', 'Export as JSON file rather than CSV')
+    .parse(process.argv);
+
+// Load configuration object for RocketChat API from JSON
+var config = require('./config.json');
+
+// Check for mandantory "-r" flag
+if (!program.room) {
+    program.outputHelp(() => program.help());
+}
+
+// Create API client
+var rocketChatClient = new RocketChatClient(config);
+
+// Empty array that will hold the message objects
+var messageArray = [];
 
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
