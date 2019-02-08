@@ -1,4 +1,6 @@
-var program = require('commander'),
+var fs = require('fs'),
+    converter = require('json-2-csv'),
+    program = require('commander'),
     RocketChatClient = require('rocketchat').RocketChatClient;
 
 /**
@@ -75,6 +77,50 @@ function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
     });
 }
 
+/**
+ * Convert passed data to CSV and write to file
+ * @param {Array} data - Data array that holds all user objects
+ * @param {Function()} cb - Callback function
+ */
+function convertToCsvAndWriteToFile(data, cb) {
+    // Convert to CSV
+    converter.json2csv(data,function(err, csv){
+        if(err) {
+            return cb(err);
+        }
+
+        fs.writeFile("export.csv", csv, function(err) {
+            if(err) {
+                return cb(err);
+            }
+
+            return cb(true);
+        });
+    }, {
+        // Do not check for key differences in each user object
+        checkSchemaDifferences: false,
+        // Make sure to wrap CSV values in double quotes
+        delimiter: {
+            wrap: '"'
+        }
+    });
+}
+
+/**
+ * Convert passed data to JSON and write to file
+ * @param {Array} data - Data array that holds all user objects
+ * @param {Function()} callback - Callback function
+ */
+function convertToJsonAndWriteToFile(data, callback) {
+    fs.writeFile("export.json", JSON.stringify(data,null,'\t'), function(err) {
+        if(err) {
+            return callback(err);
+        }
+
+        return callback(true);
+    });
+}
+
 var packagejson = require('./package.json');
 
 program
@@ -104,7 +150,15 @@ rocketChatClient.authentication.login(config.username, config.password, function
 
     testIfChannelOrGroup(program.room, function(result){
         getHistoryOfChannelOrGroup(result.type, program.room, undefined, function(data){
-            console.log(data);
+            if (program.json){
+                convertToJsonAndWriteToFile(data, function(data){
+                    success("Completed export and written as JSON to \"export.json\".");
+                });
+            } else {
+                convertToCsvAndWriteToFile(data.data, function(){
+                    success("Completed export  as CSV to \"export.csv\".");
+                });
+            }
         });
     });
 })

@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "commander": "^2.19.0",
+    "json-2-csv": "^3.2.0",
     "rocketchat": "git://github.com/frdmn/rocketchat-node.git"
   },
   "devDependencies": {},
