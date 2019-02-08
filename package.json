@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "commander": "^2.19.0",
-    "rocketchat": "git://github.com/frdmn/rocketchat-node.git#feature/add-channels.messages-groups.messages"
+    "rocketchat": "git://github.com/frdmn/rocketchat-node.git"
   },
   "devDependencies": {},
   "scripts": {

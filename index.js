@@ -78,7 +78,7 @@ var messageArray = [];
  */
  function getHistoryOfChannel(roomId, offset = 0){
     var count = 100;
-    rocketChatClient.channels.messages(roomId, {offset: offset, count: count}, function (err, body) {
+    rocketChatClient.channels.messages({roomName: "test", offset: offset, count: count}, function (err, body) {
         if (err) error(err);
 
         // Merge new messages from API response to existing messageArray
