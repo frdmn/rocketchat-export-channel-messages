@@ -1,5 +1,4 @@
 var program = require('commander'),
-    RocketChatApi = require('rocketchat').RocketChatApi,
     RocketChatClient = require('rocketchat').RocketChatClient;
 
 /**
