@@ -3,6 +3,5 @@
     "host": "rocketchat.domain.com",
     "port": "443",
     "username": "admin",
-    "password": "password",
-    "exportfile": "./export"
+    "password": "password"
 }
