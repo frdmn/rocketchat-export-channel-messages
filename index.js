@@ -25,6 +25,28 @@ function success(message){
     return process.exit(1);
 }
 
+/**
+ * Functio to check if a given roomId is actually
+ * a public room or a private group
+ * @param {String} roomId room ID to test
+ * @param {Callback} callback
+ */
+function testIfChannelOrGroup(roomId, callback){
+    rocketChatClient.channels.info(roomId, function (err, body) {
+        if (!err && body.success) {
+            return callback('channel');
+        } else {
+            rocketChatClient.groups.info(roomId, function (err, body) {
+                if (!err && body.success) {
+                    return callback('group');
+                } else {
+                    return callback(false);
+                }
+            });
+        }
+    });
+}
+
 var packagejson = require('./package.json');
 
 program
@@ -51,9 +73,8 @@ var messageArray = [];
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
 	if (!err) {
-        rocketChatClient.channels.info(program.rid, function (err, body) {
-    		console.log(err);
-    		console.log(body);
+        testIfChannelOrGroup(program.rid, function(result){
+            console.log(result);
         });
 	} else {
 		error(err);
