@@ -70,22 +70,27 @@ var rocketChatClient = new RocketChatClient(config);
 // Empty array that will hold the message objects
 var messageArray = [];
 
-function getHistoryOfChannel(roomId, oldest = '2016-09-12T11:41:29.586Z'){
+/**
+ * Function to repeatedly send rocketChatClient.channels.messages()
+ * to iterate over result pagination until final page is received
+ * @param {String} roomId - Required roomId / rid
+ * @param {Integer} offset - Optional offset can be passed
+ */
+ function getHistoryOfChannel(roomId, offset = 0){
     var count = 100;
-    rocketChatClient.channels.history({roomId: roomId, newest: oldest, count: count},{}, function (err, body) {
-        if (err) {
-            error(err);
-        }
+    rocketChatClient.channels.messages(roomId, {offset: offset, count: count}, function (err, body) {
+        if (err) error(err);
 
-        var total = body.messages.length,
-            lastMessageTimestamp = body.messages.slice(-1).pop().ts,
-
+        // Merge new messages from API response to existing messageArray
         messageArray = messageArray.concat(body.messages);
 
-        if (total === count){
-            getHistoryOfChannel(roomId, lastMessageTimestamp);
-        } else if(total < count){
-            return 'done';
+        var totalCollected = messageArray.length;
+
+        // Check if current response still has ${count} messages, if so call self again with new offset
+        if (body.messages.length === count){
+            getHistoryOfChannel(roomId, totalCollected);
+        } else {
+            success(messageArray);
         }
     });
 }
