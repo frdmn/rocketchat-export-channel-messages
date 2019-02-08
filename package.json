@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Simple Node CLI tool to export all messages of a given Rocket.Chat channel",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^2.19.0"
+  },
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
