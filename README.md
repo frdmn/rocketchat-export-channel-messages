@@ -1,5 +1,7 @@
 # rocketchat-export-channel-messages
 
+![](https://up.frd.mn/WTPKyFpRUM.png)
+
 Simple Node CLI tool to export all messages of a given [Rocket.Chat](https://rocket.chat/) channel or private group.
 
 ## Installation
