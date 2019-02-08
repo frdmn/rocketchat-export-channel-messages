@@ -1,4 +1,5 @@
 var program = require('commander'),
+    RocketChatApi = require('rocketchat').RocketChatApi,
     RocketChatClient = require('rocketchat').RocketChatClient;
 
 /**
@@ -50,7 +51,10 @@ var messageArray = [];
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
 	if (!err) {
-		success(body);
+        rocketChatClient.channels.info(program.rid, function (err, body) {
+    		console.log(err);
+    		console.log(body);
+        });
 	} else {
 		error(err);
 	}
