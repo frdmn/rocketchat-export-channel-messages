@@ -26,19 +26,20 @@ function success(message){
 }
 
 /**
- * Functio to check if a given roomId is actually
+ * Functio to check if a given roomName is actually
  * a public room or a private group
- * @param {String} roomId room ID to test
+ * @param {String} roomName room ID to test
  * @param {Callback} callback
  */
-function testIfChannelOrGroup(roomId, callback){
-    rocketChatClient.channels.info(roomId, function (err, body) {
-        if (!err && body.success) {
-            return callback({type:'channel', totalMessages: body.channel.msgs});
+function testIfChannelOrGroup(roomName, callback){
+    rocketChatClient.channels.info({roomName}, function (err, body) {
+        if (err) error(err);
+        if (body.success) {
+            return callback({type:'channel'});
         } else {
-            rocketChatClient.groups.info(roomId, function (err, body) {
+            rocketChatClient.groups.info({roomName}, function (err, body) {
                 if (!err && body.success) {
-                    return callback({type:'group', totalMessages: body.group.msgs});
+                    return callback({type:'group'});
                 } else {
                     return callback(false);
                 }
@@ -52,15 +53,15 @@ var packagejson = require('./package.json');
 program
     .version(packagejson.version)
     .description(packagejson.description)
-    .option('-r, --rid [roomId]', 'roomId of channel to export messages from')
+    .option('-r, --room [roomName]', 'roomName of channel or group to export messages from')
     .option('-j, --json', 'Export as JSON file rather than CSV')
     .parse(process.argv);
 
 // Load configuration object for RocketChat API from JSON
 var config = require('./config.json');
 
-// Check for mandantory "-c" flag
-if (!program.rid) {
+// Check for mandantory "-r" flag
+if (!program.room) {
     program.outputHelp(() => program.help());
 }
 
@@ -73,12 +74,12 @@ var messageArray = [];
 /**
  * Function to repeatedly send rocketChatClient.channels.messages()
  * to iterate over result pagination until final page is received
- * @param {String} roomId - Required roomId / rid
+ * @param {String} roomName - Required roomName
  * @param {Integer} offset - Optional offset can be passed
  */
- function getHistoryOfChannel(roomId, offset = 0){
+ function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0){
     var count = 100;
-    rocketChatClient.channels.messages({roomName: "test", offset: offset, count: count}, function (err, body) {
+    rocketChatClient[roomType].messages({roomName: roomName, offset: offset, count: count}, function (err, body) {
         if (err) error(err);
 
         // Merge new messages from API response to existing messageArray
@@ -88,7 +89,7 @@ var messageArray = [];
 
         // Check if current response still has ${count} messages, if so call self again with new offset
         if (body.messages.length === count){
-            getHistoryOfChannel(roomId, totalCollected);
+            getHistoryOfChannelOrGroup(roomType, roomName, totalCollected);
         } else {
             success(messageArray);
         }
@@ -99,13 +100,17 @@ var messageArray = [];
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
     if (err) error(err);
 
-    testIfChannelOrGroup(program.rid, function(result){
+    testIfChannelOrGroup(program.room, function(result){
         /**
          * result = {
          *   totalMessages: 123,
          *   type: channel
          * }
          */
-        getHistoryOfChannel(program.rid);
+        if (result.type === 'channel'){
+            getHistoryOfChannelOrGroup('channels', program.room);
+        } else if (result.type === 'group'){
+            getHistoryOfChannelOrGroup('groups', program.room);
+        }
     });
 })
