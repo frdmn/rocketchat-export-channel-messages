@@ -1,6 +1,6 @@
 # rocketchat-export-channel-messages
 
-Simple Node CLI tool to export all messages of a given [Rocket.Chat](https://rocket.chat/) channel.
+Simple Node CLI tool to export all messages of a given [Rocket.Chat](https://rocket.chat/) channel or private group.
 
 ## Installation
 
@@ -30,17 +30,17 @@ Make sure it contains proper user (with administration access) credentials
 
 Here's a short explanation how to use `rocketchat-export-channel-messages`:
 
-* Run `export-channel-messages.js`:
+To export as CSV (default), run:
 
-    ```shell
-    npm start
-    ```
+```shell
+node index.js --room <roomName>
+```
 
-    If you rather have a JSON export, pass the `--json` argument:
+If you rather have a JSON export, pass the `--json` argument:
 
-    ```shell
-    npm start --json
-    ```
+```shell
+node index.js --room <roomName> --json
+```
 
 ## Contributing
 
