@@ -97,17 +97,15 @@ var messageArray = [];
 
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
-	if (!err) {
-        testIfChannelOrGroup(program.rid, function(result){
-            /**
-             * result = {
-             *   totalMessages: 123,
-             *   type: channel
-             * }
-             */
-            getHistoryOfChannel(program.rid);
-        });
-	} else {
-		error(err);
-	}
+    if (err) error(err);
+
+    testIfChannelOrGroup(program.rid, function(result){
+        /**
+         * result = {
+         *   totalMessages: 123,
+         *   type: channel
+         * }
+         */
+        getHistoryOfChannel(program.rid);
+    });
 })
