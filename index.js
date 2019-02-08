@@ -34,13 +34,11 @@ function success(message){
  */
 function testIfChannelOrGroup(roomName, callback){
     rocketChatClient.channels.info({roomName}, function (err, body) {
-        if (err) error(err);
-        if (body.success) {
+        if (!err && body.success) {
             return callback({type:'channels'});
         } else {
             rocketChatClient.groups.info({roomName}, function (err, body) {
-                if (err) error(err);
-                if (body.success) {
+                if (!err && body.success) {
                     return callback({type:'groups'});
                 } else {
                     return callback(false);
@@ -149,9 +147,9 @@ var messageArray = [];
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
     if (err) error(err);
 
-    console.log('Trying to figure out room type of "#' + program.room + '"');
+    console.log('Trying to figure out room type of "#' + program.room + '"...');
     testIfChannelOrGroup(program.room, function(result){
-        console.log('Looks like a ' + result.type + '. Searching for messages ...');
+        console.log('Looks like a ' + result.type.replace(/s$/, '') + '. Searching for messages ...');
         getHistoryOfChannelOrGroup(result.type, program.room, undefined, function(data){
             if (program.json){
                 convertToJsonAndWriteToFile(data, function(data){
