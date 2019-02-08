@@ -101,12 +101,6 @@ rocketChatClient.authentication.login(config.username, config.password, function
     if (err) error(err);
 
     testIfChannelOrGroup(program.room, function(result){
-        /**
-         * result = {
-         *   totalMessages: 123,
-         *   type: channel
-         * }
-         */
         if (result.type === 'channel'){
             getHistoryOfChannelOrGroup('channels', program.room);
         } else if (result.type === 'group'){
