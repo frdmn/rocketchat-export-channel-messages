@@ -77,6 +77,7 @@ var messageArray = [];
  * @param {String} roomType - Required roomType ('channels' or 'groups')
  * @param {String} roomName - Required roomName
  * @param {Integer} offset - Optional offset can be passed
+ * @param {Object} callback - {data, totalCollected, roomType, roomName}
  */
  function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
     var count = 100;
@@ -92,7 +93,7 @@ var messageArray = [];
         if (body.messages.length === count){
             getHistoryOfChannelOrGroup(roomType, roomName, totalCollected, callback);
         } else {
-            return callback(messageArray);
+            return callback({data: messageArray, total: totalCollected, roomType: roomType.replace(/s$/, ''), roomName: roomName});
         }
     });
 }
