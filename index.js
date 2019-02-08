@@ -35,12 +35,12 @@ function testIfChannelOrGroup(roomName, callback){
     rocketChatClient.channels.info({roomName}, function (err, body) {
         if (err) error(err);
         if (body.success) {
-            return callback({type:'channel'});
+            return callback({type:'channels'});
         } else {
             rocketChatClient.groups.info({roomName}, function (err, body) {
                 if (err) error(err);
                 if (body.success) {
-                    return callback({type:'group'});
+                    return callback({type:'groups'});
                 } else {
                     return callback(false);
                 }
@@ -75,10 +75,11 @@ var messageArray = [];
 /**
  * Function to repeatedly send rocketChatClient.channels.messages()
  * to iterate over result pagination until final page is received
+ * @param {String} roomType - Required roomType ('channels' or 'groups')
  * @param {String} roomName - Required roomName
  * @param {Integer} offset - Optional offset can be passed
  */
- function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0){
+ function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
     var count = 100;
     rocketChatClient[roomType].messages({roomName: roomName, offset: offset, count: count}, function (err, body) {
         if (err) error(err);
@@ -90,9 +91,9 @@ var messageArray = [];
 
         // Check if current response still has ${count} messages, if so call self again with new offset
         if (body.messages.length === count){
-            getHistoryOfChannelOrGroup(roomType, roomName, totalCollected);
+            getHistoryOfChannelOrGroup(roomType, roomName, totalCollected, callback);
         } else {
-            success(messageArray);
+            return callback(messageArray);
         }
     });
 }
@@ -102,10 +103,8 @@ rocketChatClient.authentication.login(config.username, config.password, function
     if (err) error(err);
 
     testIfChannelOrGroup(program.room, function(result){
-        if (result.type === 'channel'){
-            getHistoryOfChannelOrGroup('channels', program.room);
-        } else if (result.type === 'group'){
-            getHistoryOfChannelOrGroup('groups', program.room);
-        }
+        getHistoryOfChannelOrGroup(result.type, program.room, undefined, function(data){
+            console.log(data);
+        });
     });
 })
