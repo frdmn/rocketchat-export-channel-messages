@@ -29,7 +29,7 @@ var packagejson = require('./package.json');
 program
     .version(packagejson.version)
     .description(packagejson.description)
-    .option('-c, --channel [channel]', 'Channel to export messages from')
+    .option('-r, --rid [roomId]', 'roomId of channel to export messages from')
     .option('-j, --json', 'Export as JSON file rather than CSV')
     .parse(process.argv);
 
@@ -37,7 +37,7 @@ program
 var config = require('./config.json');
 
 // Check for mandantory "-c" flag
-if (!program.channel) {
+if (!program.rid) {
     program.outputHelp(() => program.help());
 }
 
