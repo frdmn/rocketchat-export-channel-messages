@@ -67,6 +67,7 @@ function getHistoryOfChannelOrGroup(roomType, roomName, offset = 0, callback){
         messageArray = messageArray.concat(body.messages);
 
         var totalCollected = messageArray.length;
+        console.log('Found ' + count + ' messages... Looking for more (total: ' + totalCollected + ')...')
 
         // Check if current response still has ${count} messages, if so call self again with new offset
         if (body.messages.length === count){
@@ -148,15 +149,17 @@ var messageArray = [];
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
     if (err) error(err);
 
+    console.log('Trying to figure out room type of "#' + program.room + '"');
     testIfChannelOrGroup(program.room, function(result){
+        console.log('Looks like a ' + result.type + '. Searching for messages ...');
         getHistoryOfChannelOrGroup(result.type, program.room, undefined, function(data){
             if (program.json){
                 convertToJsonAndWriteToFile(data, function(data){
-                    success("Completed export and written as JSON to \"export.json\".");
+                    success("Completed JSON export, successfully written to \"export.json\".");
                 });
             } else {
                 convertToCsvAndWriteToFile(data.data, function(){
-                    success("Completed export  as CSV to \"export.csv\".");
+                    success("Completed CSV export, successfully written to \"export.csv\".");
                 });
             }
         });
