@@ -1,6 +1,29 @@
 var program = require('commander'),
     RocketChatClient = require('rocketchat').RocketChatClient;
 
+/**
+ * Function to write error message to console and also exit the process
+ * with error code 1
+ * @param  {String|Object} err - Object that holds the error message
+ * @param  {Integer} code - Optional status code to exit with (defaults to 1)
+ * @return {Object} process - End process with exit code
+ */
+function error(err, code = 1){
+    console.log("error: ", err);
+    return process.exit(code);
+}
+
+/**
+ * Write (success) messages to console and exit the process with
+ * error code 0
+ * @param  {String} message - String that holds the message to print
+ * @return {Object} - Return with error code 0
+ */
+function success(message){
+    console.log(message);
+    return process.exit(1);
+}
+
 var packagejson = require('./package.json');
 
 program
@@ -27,8 +50,8 @@ var messageArray = [];
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
 	if (!err) {
-		console.log(body);
+		success(body);
 	} else {
-		console.log(err);
+		error(err);
 	}
 })
