@@ -34,11 +34,11 @@ function success(message){
 function testIfChannelOrGroup(roomId, callback){
     rocketChatClient.channels.info(roomId, function (err, body) {
         if (!err && body.success) {
-            return callback('channel');
+            return callback({type:'channel', totalMessages: body.channel.msgs});
         } else {
             rocketChatClient.groups.info(roomId, function (err, body) {
                 if (!err && body.success) {
-                    return callback('group');
+                    return callback({type:'group', totalMessages: body.group.msgs});
                 } else {
                     return callback(false);
                 }
@@ -70,11 +70,37 @@ var rocketChatClient = new RocketChatClient(config);
 // Empty array that will hold the message objects
 var messageArray = [];
 
+function getHistoryOfChannel(roomId, oldest = '2016-09-12T11:41:29.586Z'){
+    var count = 100;
+    rocketChatClient.channels.history({roomId: roomId, newest: oldest, count: count},{}, function (err, body) {
+        if (err) {
+            error(err);
+        }
+
+        var total = body.messages.length,
+            lastMessageTimestamp = body.messages.slice(-1).pop().ts,
+
+        messageArray = messageArray.concat(body.messages);
+
+        if (total === count){
+            getHistoryOfChannel(roomId, lastMessageTimestamp);
+        } else if(total < count){
+            return 'done';
+        }
+    });
+}
+
 // Authenticate using admin credentials stored in config object
 rocketChatClient.authentication.login(config.username, config.password, function(err, body) {
 	if (!err) {
         testIfChannelOrGroup(program.rid, function(result){
-            console.log(result);
+            /**
+             * result = {
+             *   totalMessages: 123,
+             *   type: channel
+             * }
+             */
+            getHistoryOfChannel(program.rid);
         });
 	} else {
 		error(err);
