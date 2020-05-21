@@ -7,13 +7,14 @@ Simple Node CLI tool to export all messages of a given [Rocket.Chat](https://roc
 ## Installation
 
 1. Make sure you've installed all requirements
-2. Clone this repository:
+2. Clone this repository and enter it:
 
     ```shell
     git clone https://github.com/frdmn/rocketchat-export-channel-messages
+    cd rocketchat-export-channel-messages
     ```
 
-3. Copy and adjust configuration file from sample:
+3. Copy and adjust configuration file from sample (On Windows you can open the config.json file with e.g. notepad and edit it manually, if you don't have bash or vi installed.):
 
     ```shell
     cp config.sample.json config.json
